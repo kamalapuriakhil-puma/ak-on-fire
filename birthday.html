@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Happy Birthday</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #ffccf9;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 3em;
+      color: #ff1493;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .input-container {
+      margin-top: 20px;
+    }
+
+    input {
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      width: 250px;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      font-size: 18px;
+      border: none;
+      background-color: #ff69b4;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="input-container">
+    <input type="text" id="nameInput" placeholder="Enter Name" />
+    <button onclick="celebrate()">Celebrate 🎉</button>
+  </div>
+
+  <h1 id="birthdayMessage"></h1>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const confetti = [];
+    const colors = ['#ff0a54', '#ff477e', '#ff85a1', '#fbb1bd', '#f9bec7', '#fcd5ce', '#fff'];
+
+    class Confetto {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height - canvas.height;
+        this.radius = Math.random() * 6 + 4;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.velocityY = Math.random() * 3 + 2;
+        this.velocityX = (Math.random() - 0.5) * 4;
+        this.rotation = Math.random() * 2 * Math.PI;
+        this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+      }
+
+      update() {
+        this.y += this.velocityY;
+        this.x += this.velocityX;
+        this.rotation += this.rotationSpeed;
+
+        if (this.y > canvas.height) {
+          this.y = -10;
+          this.x = Math.random() * canvas.width;
+        }
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(-this.radius/2, -this.radius/2, this.radius, this.radius);
+        ctx.restore();
+      }
+    }
+
+    function createConfetti() {
+      for (let i = 0; i < 200; i++) {
+        confetti.push(new Confetto());
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confetti.forEach(c => {
+        c.update();
+        c.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+
+    function celebrate() {
+      const name = document.getElementById('nameInput').value.trim();
+      if (name === '') {
+        alert('Please enter a name!');
+        return;
+      }
+
+      document.getElementById('birthdayMessage').textContent = `🎉 Happy Birthday, ${name}! 🎂`;
+      createConfetti();
+      animate();
+    }
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+
+</body>
+</html>
